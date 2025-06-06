@@ -1,12 +1,18 @@
-import React from 'react'
-import { Outlet } from 'react-router'
+import React from 'react';
+import { Outlet } from 'react-router';
+import Navbar from './Navbar';
+import Footer from './Footer';
 
 const Root = () => {
   return (
-    <div>
-      <Outlet />
-    </div>
-  )
-}
+    <>
+      <Navbar />
+      <main className="flex-1">
+        <Outlet />
+      </main>
+      <Footer />
+    </>
+  );
+};
 
-export default Root
+export default Root;
