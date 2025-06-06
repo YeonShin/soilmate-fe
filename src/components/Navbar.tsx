@@ -18,7 +18,7 @@ const MENU = [
   { to: "/monitor", icon: <BiBarChart      size={28} />, label: "모니터링"      },
   { to: "/irrigation",icon: <IoIosWater     size={28} />, label: "관수 제어"     },
   { to: "/alerts",  icon: <IoIosNotifications  size={28} />, label: "경고 알림 내역" },
-  { to: "/manage",  icon: <FaLeaf    size={28} />, label: "식물 관리"     },
+  { to: "/manage",  icon: <FaLeaf    size={28} />, label: "작물 관리"     },
 ]
 
 const Navbar: React.FC = () => {
