@@ -1,10 +1,13 @@
-const App = () => {
-    return (
-        <>
-            <h1 className="col-end-1 text-3xl font-bold">Hello world!</h1>
-            <button className="text-2xl font-bold">2</button>
-        </>
-    );
-};
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import Router from './Router.tsx';
+import { BrowserRouter } from 'react-router';
+import './index.css';
 
-export default App;
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <BrowserRouter>
+      <Router />
+    </BrowserRouter>
+  </StrictMode>
+);
