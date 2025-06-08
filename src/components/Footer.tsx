@@ -3,12 +3,16 @@ import React from 'react';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-green-800 text-white py-6">
+    <footer className="bg-green-800 dark:bg-green-900 text-white dark:text-gray-300 py-6">
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
         {/* 좌측: 브랜드명 + 저작권 */}
         <div>
-          <h2 className="text-lg font-semibold">SoilMate.</h2>
-          <p className="text-sm mt-1">© Copyright 2025 by SoilMate</p>
+          <h2 className="text-lg font-semibold text-white dark:text-gray-100">
+            SoilMate.
+          </h2>
+          <p className="text-sm mt-1 text-white dark:text-gray-400">
+            © Copyright 2025 by SoilMate
+          </p>
         </div>
 
         {/* 우측: GitHub 아이콘 링크 */}
@@ -16,7 +20,7 @@ const Footer: React.FC = () => {
           href="https://github.com/YeonShin/soilmate-fe"
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:opacity-75 transition"
+          className="text-white dark:text-gray-300 hover:opacity-75 transition"
         >
           <svg
             className="w-8 h-8 fill-current"
