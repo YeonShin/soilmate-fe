@@ -1,27 +1,42 @@
-import { create } from 'zustand';
+// src/store/usePlantStore.ts
+import { create } from 'zustand'
 
+// API에서 받아오는 Plant, SensorData 타입 정의
 export interface Plant {
-  id: number;
-  name: string;
-  plantType: string;
-  minTemp: number;
-  maxTemp: number;
-  minHumidity: number;
-  maxHumidity: number;
-  minSoilMoisture: number;
-  maxSoilMoisture: number;
+  id: number
+  name: string
+  plantType: string
+  minTemp: number
+  maxTemp: number
+  minHumidity: number
+  maxHumidity: number
+  minSoilMoisture: number
+  maxSoilMoisture: number
+}
+
+export interface SensorData {
+  temperature: number
+  humidity: number
+  soilMoisture: number
 }
 
 interface PlantState {
-  plants: Plant[];
-  selectedPlantId: number | null;
-  setPlants: (plants: Plant[]) => void;
-  setSelectedPlantId: (id: number) => void;
+  plants: Plant[]
+  selectedPlant: Plant | null
+  sensorData: SensorData
+
+  // actions
+  setPlants: (plants: Plant[]) => void
+  setSelectedPlant: (p: Plant) => void
+  setSensorData: (d: SensorData) => void
 }
 
 export const usePlantStore = create<PlantState>((set) => ({
   plants: [],
-  selectedPlantId: null,
+  selectedPlant: null,
+  sensorData: { temperature: 0, humidity: 0, soilMoisture: 0 },
+
   setPlants: (plants) => set({ plants }),
-  setSelectedPlantId: (id) => set({ selectedPlantId: id }),
-}));
+  setSelectedPlant: (selectedPlant) => set({ selectedPlant }),
+  setSensorData: (sensorData) => set({ sensorData }),
+}))
