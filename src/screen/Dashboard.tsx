@@ -56,13 +56,13 @@ const Dashboard = () => {
 
     // 2) 스토어에 넣기
     setPlants(dummyPlants)
-    setSelectedPlant(dummyPlants[0])
+    // setSelectedPlant(dummyPlants[0])
     setSensorData(dummySensorData)
   }, [setPlants, setSelectedPlant, setSensorData])
 
   return (
     <div className='p-2 space-y-6'>
-      <DashboardHeader />
+      <DashboardHeader title="대시보드" subTitle="실시간 농장 상태를 모니터링하고 관리하세요"/>
 
 
       <hr className='h-0.25 border-0 bg-gray-200 dark:bg-gray-600' />

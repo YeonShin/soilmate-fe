@@ -1,7 +1,12 @@
 import React from 'react'
 import { usePlantStore } from '../../store/usePlantStore'
 
-const DashboardHeader = () => {
+interface Props {
+  title: string,
+  subTitle: string
+}
+
+const DashboardHeader:React.FC<Props> = ({title, subTitle}) => {
   const { plants, selectedPlant, setSelectedPlant } = usePlantStore()
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -13,8 +18,8 @@ const DashboardHeader = () => {
   return (
     <div className='flex item-center justify-between'>
       <div>
-        <h1 className='text-2xl font-bold text-gray-900 dark:text-gray-100'>대시보드</h1>
-        <p className='mt-1 text-gray-500 dark:text-gray-400'>실시간 농장 상태를 모니터링하고 관리하세요</p>
+        <h1 className='text-2xl font-bold text-gray-900 dark:text-gray-100'>{title}</h1>
+        <p className='mt-1 text-gray-500 dark:text-gray-400'>{subTitle}</p>
       </div>
       <select
         id='plant-select'
