@@ -7,7 +7,8 @@ type WeatherInfo = {
   iconUrl: string
   high: number
   low: number
-  locationName: string
+  locationName: string,
+  dateTime: string 
 }
 
 const WeatherCard = () => {
@@ -51,6 +52,16 @@ const WeatherCard = () => {
         })
 
         const weatherMain = data.weather[0]
+        const dt = new Date(data.dt * 1000)
+        const dateTime = dt.toLocaleString('ko-KR', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+
+
         setWeather({
           temp: Math.round(data.main.temp),
           condition: weatherMain.main.toLowerCase(),
@@ -58,6 +69,7 @@ const WeatherCard = () => {
           high: Math.round(data.main.temp_max),
           low: Math.round(data.main.temp_min),
           locationName: data.name,
+          dateTime
         })
       } catch (error) {
         console.error('날씨 정보 로드 실패:', error)
@@ -109,13 +121,13 @@ const WeatherCard = () => {
 
 
   return (
-    <div className='flex flex-col md:flex-row bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-6 md:space-y-0 md:space-x-6'>
+    <div className='flex flex-col h-64 md:flex-row bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-6 md:space-y-0 md:space-x-6'>
       {/* — 좌측: 날씨 정보 */}
       <div className='flex-1 flex flex-col justify-between'>
         {weather ? (
           <>
-            <div>
-              <div className='flex items-center'>
+            <div className='flex items-center'>
+              <div className=''>
                 <img src={weather.iconUrl} alt={weather.condition} className='w-16 h-16 mr-4' />
                 <div>
                   <div className='text-4xl font-bold text-gray-900 dark:text-gray-100'>
@@ -127,19 +139,22 @@ const WeatherCard = () => {
                   <div className='mt-2 text-sm text-gray-500 dark:text-gray-400'>
                     {weather.locationName}
                   </div>
+                  <div className="text-xs text-gray-400 dark:text-gray-500">
+                    기준: {weather.dateTime}
+                  </div>
                 </div>
               </div>
             </div>
-            <div className='mt-4 text-sm text-gray-700 dark:text-gray-300'>
+            {/* <div className='text-sm text-gray-700 dark:text-gray-300'>
               H: <span className="font-medium">{weather.high}°C</span> &nbsp; L:{' '}
               <span className="font-medium">{weather.low}°C</span>
-            </div>
+            </div> */}
           </>
         ) : (
           <div className="text-gray-500 dark:text-gray-400">날씨 정보를 불러오는 중...</div>
         )}
       </div>
-      <div className='flex-1 h-128 md:h-auto rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'  ref={mapRef} >
+      <div className='flex-1 md:h-auto rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'  ref={mapRef} >
         {!coords && (
           <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
             위치 정보를 가져오는 중...

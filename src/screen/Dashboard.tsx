@@ -61,7 +61,7 @@ const Dashboard = () => {
   }, [setPlants, setSelectedPlant, setSensorData])
 
   return (
-    <div className='p-6 space-y-6'>
+    <div className='p-2 space-y-6'>
       <DashboardHeader />
 
 

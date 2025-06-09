@@ -32,7 +32,7 @@ const Navbar: React.FC = () => {
   return (
      <aside
       className={[
-        'flex flex-col justify-between h-screen bg-white dark:bg-gray-900 border-r-gray-200 transition-width duration-300',
+        'flex flex-col justify-between h-screen sticky top-0 bg-white dark:bg-gray-900 border-r border-r-gray-200 dark:border-r-gray-700 transition-width duration-300',
         collapsed ? 'w-16' : 'w-64',
       ].join(' ')}
     >
