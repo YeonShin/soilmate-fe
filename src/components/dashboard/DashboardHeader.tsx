@@ -39,7 +39,7 @@ const DashboardHeader = () => {
         </option>
         {plants.map((plant) => (
           <option key={plant.id} value={plant.id}>
-            {plant.name}
+            {plant.name}&#40;{plant.plantType}&#41;
           </option>
         ))}
         </select>
