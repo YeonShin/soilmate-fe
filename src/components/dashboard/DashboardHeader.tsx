@@ -1,6 +1,15 @@
 import React from 'react'
+import { usePlantStore } from '../../store/usePlantStore'
 
 const DashboardHeader = () => {
+  const { plants, selectedPlant, setSelectedPlant } = usePlantStore()
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const id = Number(e.target.value)
+    const plant = plants.find((p) => p.id === id)
+    if (plant) setSelectedPlant(plant)
+  }
+
   return (
     <div className='flex item-center justify-between'>
       <div>
@@ -9,6 +18,8 @@ const DashboardHeader = () => {
       </div>
       <select
         id='plant-select'
+        value={selectedPlant?.id ?? ''}
+        onChange={handleChange}
         className='
               mt-1 block w-full sm:w-64
               pl-3 pr-10 py-2 text-base
@@ -23,10 +34,14 @@ const DashboardHeader = () => {
              hover:bg-gray-50 dark:hover:bg-gray-600
               transition-colors
         '>
-          <option>
-            asas
+        <option value="" disabled>
+          식물 선택
+        </option>
+        {plants.map((plant) => (
+          <option key={plant.id} value={plant.id}>
+            {plant.name}
           </option>
-
+        ))}
         </select>
       
     </div>
