@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Watering = () => {
+const ControlIrrigation = () => {
   return (
     <div>
       
@@ -8,4 +8,4 @@ const Watering = () => {
   )
 }
 
-export default Watering
+export default ControlIrrigation

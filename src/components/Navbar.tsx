@@ -16,7 +16,7 @@ import { useSidebarStore } from "../store/useSidebarStore";
 const MENU = [
   { to: "/",        icon: <MdHomeFilled    size={28} />, label: "대시보드"      },
   { to: "/monitor", icon: <BiBarChart      size={28} />, label: "모니터링"      },
-  { to: "/watering",icon: <IoIosWater     size={28} />, label: "관수 제어"     },
+  { to: "/irrigation",icon: <IoIosWater     size={28} />, label: "관수 제어"     },
   { to: "/alerts",  icon: <IoIosNotifications  size={28} />, label: "경고 알림 내역" },
   { to: "/manage",  icon: <FaLeaf    size={28} />, label: "식물 관리"     },
 ]

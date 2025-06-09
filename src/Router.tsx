@@ -5,9 +5,9 @@ import NotFound from './screen/NotFound';
 import Dashboard from './screen/Dashboard';
 import RequireAuth from './components/RequireAuth';
 import Monitoring from './screen/Monitoring';
-import Watering from './screen/Watering';
 import Alerts from './screen/Alerts';
 import Manage from './screen/Manage';
+import Irrigation from './screen/Irrigation';
 
 const Router = () => {
   return (
@@ -19,7 +19,7 @@ const Router = () => {
           <Route>
             <Route index element={<Dashboard />} />
             <Route path='monitor' element={<Monitoring />} />
-            <Route path='watering' element={<Watering />} />
+            <Route path='irrigation' element={<Irrigation/>} />
             <Route path='alerts' element={<Alerts />} />
             <Route path='manage' element={<Manage />} />
           </Route>
