@@ -4,6 +4,10 @@ import Root from './components/Root';
 import NotFound from './screen/NotFound';
 import Dashboard from './screen/Dashboard';
 import RequireAuth from './components/RequireAuth';
+import Monitoring from './screen/Monitoring';
+import Watering from './screen/Watering';
+import Alerts from './screen/Alerts';
+import Manage from './screen/Manage';
 
 const Router = () => {
   return (
@@ -11,9 +15,14 @@ const Router = () => {
       <Route path="login" element={<Login />} />
 
         <Route element={<RequireAuth />}>
-          <Route path="/" element={<Root />} >
-        <Route index element={<Dashboard />} />
-        {/* 농장 관리 관련 페이지 라우팅 */}
+          <Route path='/' element={<Root />} >
+          <Route>
+            <Route index element={<Dashboard />} />
+            <Route path='monitor' element={<Monitoring />} />
+            <Route path='watering' element={<Watering />} />
+            <Route path='alerts' element={<Alerts />} />
+            <Route path='manage' element={<Manage />} />
+          </Route>
         </Route>
       </Route>
       <Route path='*' element={<NotFound />} />
