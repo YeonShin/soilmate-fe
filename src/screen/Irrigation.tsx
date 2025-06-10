@@ -66,6 +66,30 @@ const Irrigation = () => {
     setPlants(dummyPlants)
     // setSelectedPlant(dummyPlants[0])
     setSensorData(dummySensorData)
+
+    setLogs([
+      {
+        id: 1,
+        plant: dummyPlants[0],
+        amountMl: 200,
+        method: 'auto',
+        timestamp: '2025-06-09T12:00:00',
+      },
+      {
+        id: 2,
+        plant: dummyPlants[1],
+        amountMl: 150,
+        method: 'manual',
+        timestamp: '2025-06-09T10:30:00',
+      },
+      {
+        id: 3,
+        plant: dummyPlants[0],
+        amountMl: 180,
+        method: 'auto',
+        timestamp: '2025-06-09T08:00:00',
+      },
+    ])
   }, [setPlants, setSelectedPlant, setSensorData])
 
     const handleIrrigate = (amountMl: number) => {
@@ -93,7 +117,7 @@ const Irrigation = () => {
       {true! && <AlertBanner /> }
       <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
         <ControlIrrigation onIrrigate={handleIrrigate} disabled={loading}  />
-        <IrrigationLogs />
+        <IrrigationLogs logs={logs} />
       </div>
     </div>
   )
