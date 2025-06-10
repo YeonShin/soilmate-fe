@@ -1,5 +1,6 @@
 import axios from 'axios'
 import React, { useEffect, useRef, useState } from 'react'
+import { ClipLoader } from 'react-spinners'
 
 type WeatherInfo = {
   temp: number
@@ -151,13 +152,18 @@ const WeatherCard = () => {
             </div> */}
           </>
         ) : (
-          <div className="text-gray-500 dark:text-gray-400">날씨 정보를 불러오는 중...</div>
+          <div className='flex flex-col items-center justify-center flex-1'>
+          <ClipLoader size={32} className=" text-gray-500 dark:text-gray-400" />
+          <div className="mt-2 text-gray-500 dark:text-gray-400">날씨 정보를 불러오는 중...</div>
+          </div>
+
         )}
       </div>
       <div className='flex-1 md:h-auto rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'  ref={mapRef} >
         {!coords && (
-          <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
-            위치 정보를 가져오는 중...
+          <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400">
+            <ClipLoader size={32} className=" text-gray-500 dark:text-gray-400" />
+            <span className='mt-2 text-gray-500 dark:text-gray-400'>위치 정보를 가져오는 중...</span>
           </div>
         )}
       </div>

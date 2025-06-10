@@ -1,9 +1,10 @@
 // src/components/dashboard/SensorCard.tsx
-import React, { useState, useEffect } from 'react' 
+import React, { useState, useEffect } from 'react'
 import { usePlantStore } from '../../store/usePlantStore'
 import { MdGrass } from 'react-icons/md'
 import { FaTemperatureHalf } from 'react-icons/fa6'
 import { IoIosWater } from 'react-icons/io'
+import { ClipLoader } from 'react-spinners' 
 
 type SensorType = 'temperature' | 'humidity' | 'soilMoisture'
 
@@ -15,7 +16,7 @@ const SensorCard: React.FC<SensorCardProps> = ({ type }) => {
   const { selectedPlant, sensorData } = usePlantStore()
   const [fillPercent, setFillPercent] = useState(0)
 
-  // 2) selectedPlant가 없을 때도 정의될 수 있는 기본 config
+  // 기본 config (selectedPlant 없을 때도 접근 가능)
   const fallback = {
     title: '',
     unit: '',
@@ -59,12 +60,11 @@ const SensorCard: React.FC<SensorCardProps> = ({ type }) => {
   const { title, unit, value, min, max, Icon, iconColor } =
     configMap[type] || fallback
 
-  // 3) percent도 무조건 계산
   const percent = selectedPlant
     ? Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100))
     : 0
 
-  // 4) 애니메이션용 훅도 최상단에서 호출
+  // 애니메이션
   useEffect(() => {
     if (!selectedPlant) {
       setFillPercent(0)
@@ -74,18 +74,24 @@ const SensorCard: React.FC<SensorCardProps> = ({ type }) => {
     return () => clearTimeout(timer)
   }, [percent, selectedPlant])
 
-  // 5) 실제 렌더링은 여기서 체크
-  if (!selectedPlant) return null
+  // 로딩 상태: selectedPlant가 없으면 로딩 중
+  const isLoading = !selectedPlant
 
-  // 6) 상태 텍스트
+  // 상태 텍스트
   const statusColor = value < min || value > max ? 'red' : 'green'
   const statusLabel =
     value < min ? '낮음' : value > max ? '높음' : '정상'
 
-
-
   return (
-    <div className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
+    <div className="relative border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
+      {/* 로딩 오버레이 */}
+      {isLoading && (
+        <div className="absolute inset-0 z-10 bg-white bg-opacity-70 dark:bg-gray-800 dark:bg-opacity-70 flex flex-col items-center justify-center rounded-lg">
+          <ClipLoader size={32} className=" text-gray-500 dark:text-gray-400" />
+          <span className="mt-2 text-gray-700 dark:text-gray-300">로딩 중…</span>
+        </div>
+      )}
+
       {/* 헤더 */}
       <div className="flex justify-between items-start">
         <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">{title}</h3>
@@ -102,12 +108,12 @@ const SensorCard: React.FC<SensorCardProps> = ({ type }) => {
 
       {/* 상태 배지 */}
       <span
-        className={
-          `inline-block mt-1 px-2 py-0.5 text-xs font-medium 
-           bg-${statusColor}-100 dark:bg-${statusColor}-900
-           text-${statusColor}-800 dark:text-gray-100
-           rounded-full`
-        }
+        className={`
+          inline-block mt-1 px-2 py-0.5 text-xs font-medium
+          bg-${statusColor}-100 dark:bg-${statusColor}-900
+          text-${statusColor}-800 dark:text-gray-100
+          rounded-full
+        `}
       >
         {statusLabel}
       </span>
