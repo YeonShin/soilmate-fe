@@ -2,10 +2,21 @@ import React, { useEffect, useState } from 'react'
 import { usePlantStore, type Plant, type SensorData } from '../store/usePlantStore';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
 import AlertBanner from '../components/dashboard/AlertBanner';
+import ControlIrrigation from '../components/irrigation/ControlIrrigation';
+import IrrigationLogs from '../components/irrigation/IrrigationLogs';
+
+interface IrrigationLog {
+  id: number
+  plant: Plant
+  amountMl: number
+  method: 'auto' | 'manual'
+  timestamp: string
+}
 
 const Irrigation = () => {
   const {selectedPlant, setPlants, setSelectedPlant, setSensorData} = usePlantStore();
   const [loading, setLoading] = useState(false)
+  const [logs, setLogs] = useState<IrrigationLog[]>([])
 
   useEffect(() => {
     const dummyPlants: Plant[] = [
@@ -57,6 +68,22 @@ const Irrigation = () => {
     setSensorData(dummySensorData)
   }, [setPlants, setSelectedPlant, setSensorData])
 
+    const handleIrrigate = (amountMl: number) => {
+    if (!selectedPlant) return
+    setLoading(true)
+    // 나중에 API 호출
+    const newLog: IrrigationLog = {
+      id: Date.now(),
+      plant: selectedPlant,
+      amountMl,
+      method: 'manual',
+      timestamp: new Date().toISOString(),
+    }
+    // 더미 반영
+    setLogs((prev) => [newLog, ...prev])
+    setLoading(false)
+  }
+
   return (
     <div className='p-2 space-y-6'>
       <DashboardHeader title="관수 제어" subTitle='작물의 수동 관수 및 관수 기록을 확인하세요요' />
@@ -64,6 +91,10 @@ const Irrigation = () => {
       <hr className='h-0.25 border-0 bg-gray-200 dark:bg-gray-600' />
 
       {true! && <AlertBanner /> }
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+        <ControlIrrigation onIrrigate={handleIrrigate} disabled={loading}  />
+        <IrrigationLogs />
+      </div>
     </div>
   )
 }
