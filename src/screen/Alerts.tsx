@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { usePlantStore, type Plant, type SensorData } from '../store/usePlantStore';
+import { usePlantStore } from '../store/usePlantStore';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
 import type { AlertLog } from '../components/alerts/AlertHistory';
 import axios from 'axios';
 import { ClipLoader } from 'react-spinners'
 import AlertHistory from '../components/alerts/AlertHistory';
+import { useAuthStore } from '../store/useAuthStore';
 
 const TABS = [
   { key: 'all'           as const, label: '전체' },
@@ -14,131 +15,76 @@ const TABS = [
 ]
 type TabKey = typeof TABS[number]['key']
 
-const dummyAlerts: AlertLog[] = [
-  {
-    id: 1,
-    plant: { id: 1, name: '토마토' },
-    sensorType: 'soil_moisture',
-    thresholdType: 'min',
-    value: 28.5,
-    timestamp: '2025-06-09T14:30:00',
-  },
-  {
-    id: 2,
-    plant: { id: 2, name: '상추' },
-    sensorType: 'temp',
-    thresholdType: 'max',
-    value: 32.1,
-    timestamp: '2025-06-09T13:15:00',
-  },
-  {
-    id: 3,
-    plant: { id: 1, name: '토마토' },
-    sensorType: 'humidity',
-    thresholdType: 'max',
-    value: 92.3,
-    timestamp: '2025-06-09T12:00:00',
-  },
-  {
-    id: 4,
-    plant: { id: 3, name: '딸기' },
-    sensorType: 'temp',
-    thresholdType: 'min',
-    value: 17.8,
-    timestamp: '2025-06-09T11:30:00',
-  },
-  {
-    id: 5,
-    plant: { id: 2, name: '상추' },
-    sensorType: 'soil_moisture',
-    thresholdType: 'max',
-    value: 82.0,
-    timestamp: '2025-06-09T10:00:00',
-  },
-]
+const sensorMap: Record<TabKey, string> = {
+  all: '',
+  temp: 'temp',         // 백엔드 sensor/temperature 엔드포인트 사용
+  humidity: 'humidity',
+  soil_moisture: 'soil_moisture',
+}
+
 
 const Alerts = () => {
-  const {selectedPlant, setPlants, setSelectedPlant, setSensorData} = usePlantStore();
+  const {selectedPlant, setPlants} = usePlantStore();
   const [activeTab, setActiveTab] = useState<TabKey>('all')
-  const [alerts, setAlerts]   = useState<AlertLog[]>([])
   const [loading, setLoading] = useState(false)
+  const [alerts, setAlerts] = useState<AlertLog[]>([]) 
+  const {token} = useAuthStore();
 
-  useEffect(() => {
-    const dummyPlants: Plant[] = [
-      {
-        id: 1,
-        name: '토마토',
-        plantType: '과채류',
-        minTemp: 20,
-        maxTemp: 30,
-        minHumidity: 60,
-        maxHumidity: 80,
-        minSoilMoisture: 30,
-        maxSoilMoisture: 70,
-      },
-      {
-        id: 2,
-        name: '상추',
-        plantType: '엽채류',
-        minTemp: 15,
-        maxTemp: 25,
-        minHumidity: 65,
-        maxHumidity: 90,
-        minSoilMoisture: 40,
-        maxSoilMoisture: 80,
-      },
-      {
-        id: 3,
-        name: '딸기',
-        plantType: '과채류',
-        minTemp: 18,
-        maxTemp: 28,
-        minHumidity: 65,
-        maxHumidity: 85,
-        minSoilMoisture: 35,
-        maxSoilMoisture: 75,
-      },
-    ]
+  const fetchPlants = async () => {
+    try {
+      const res = await axios.get(
+        `/api/plants`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        }
+      )
 
-    // 2) 더미 센서 데이터
-    const dummySensorData: SensorData = {
-      temperature: 25.5,
-      humidity: 82.5,
-      soilMoisture: 22.5,
+      setPlants(res.data);
+    } catch (err) {
+      console.error("작물 정보 조회 실패", err)
     }
+  } 
 
-    // 2) 스토어에 넣기
-    setPlants(dummyPlants)
-    setSensorData(dummySensorData)
-  }, [setPlants, setSelectedPlant, setSensorData])
+  const fetchAlerts = async () => {
+    if (selectedPlant === null) return;
+    setLoading(true);
+
+    let url = `/api/alerts/plant/${selectedPlant.id}`
+      if (activeTab !== 'all') {
+        url += `/sensor/${sensorMap[activeTab]}`
+      }
+
+    try {
+      const res = await axios.get<AlertLog[]>(
+        url,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        }
+      )
+      
+      setAlerts(res.data)
+      setLoading(false);
+    } catch (err) {
+      console.error("센서 오류 조회 실패", err)
+    }
+  }
+
+
 
   useEffect(() => {
-    if (!selectedPlant) return
-    setLoading(true)
-    const url =
-      activeTab === 'all'
-        ? `/api/alerts/plant/${selectedPlant.id}`                   // 전체 조회
-        : `/api/alerts/plant/${selectedPlant.id}/sensor/${activeTab}` // 필터 조회
+    fetchPlants()
+  }, [])
 
-    const filtered =
-      activeTab === 'all'
-        ? dummyAlerts
-            .filter(a => a.plant.id === selectedPlant.id)
-        : dummyAlerts
-            .filter(a => a.plant.id === selectedPlant.id && a.sensorType === activeTab)
-
-    setAlerts(filtered);
-    setLoading(false);
-
-    // api 연결시 주석 해제
-    // axios
-    //   .get<AlertLog[]>(url)
-    //   .then((res) => setAlerts(res.data))
-    //   .catch(console.error)
-    //   .finally(() => setLoading(false))
-
-
+  useEffect(() => {
+    fetchAlerts()
   }, [activeTab, selectedPlant])
+
   
   return (
     <div className='p-2 space-y-6'>

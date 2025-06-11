@@ -4,14 +4,14 @@ import DashboardHeader from '../components/dashboard/DashboardHeader'
 import AlertBanner from '../components/dashboard/AlertBanner'
 import { PlantItem } from '../components/manage/PlantItem'
 import { AddPlantCard } from '../components/manage/AddPlantCard'
-import { usePlantStore, type Plant } from '../store/usePlantStore'
+import { usePlantStore } from '../store/usePlantStore'
 import { EditPlantModal } from '../components/manage/EditPlantModal'
 import axios from 'axios'
 import { useAuthStore } from '../store/useAuthStore'
 import AddPlantModal from '../components/manage/AddPlantModal'
 
 const Manage: React.FC = () => {
-  const {plants, selectedPlant, setPlants, setSelectedPlant} = usePlantStore();
+  const {plants, selectedPlant, setPlants} = usePlantStore();
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false);
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
   const { token } = useAuthStore();
@@ -32,7 +32,7 @@ const Manage: React.FC = () => {
       } catch (err) {
         console.error("작물 정보 조회 실패", err)
       }
-    } 
+  } 
 
   useEffect(() => {
 

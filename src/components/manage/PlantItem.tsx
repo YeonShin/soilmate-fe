@@ -22,7 +22,6 @@ export interface Plant {
 
 interface Props {
   plant: Plant
-  onDelete: (p: Plant) => void
   setEditOpen: React.Dispatch<React.SetStateAction<boolean>>
   onSuccess: () => void 
 }
