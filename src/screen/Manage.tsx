@@ -1,11 +1,18 @@
-import React, { useEffect } from 'react'
-import { usePlantStore, type Plant, type SensorData } from '../store/usePlantStore';
-import DashboardHeader from '../components/dashboard/DashboardHeader';
-import AlertBanner from '../components/dashboard/AlertBanner';
+// src/screens/Manage.tsx
+import React, { useEffect, useState } from 'react'
+import DashboardHeader from '../components/dashboard/DashboardHeader'
+import AlertBanner from '../components/dashboard/AlertBanner'
+import { PlantItem } from '../components/manage/PlantItem'
+import { AddPlantCard } from '../components/manage/AddPlantCard'
+import { usePlantStore, type Plant, type SensorData } from '../store/usePlantStore'
+import { AddPlantModal } from '../components/manage/AddPlantModal'
+import { EditPlantModal } from '../components/manage/EditPlantModal'
 
-const Manage = () => {
-  const {setPlants, setSelectedPlant, setSensorData} = usePlantStore();
-  
+const Manage: React.FC = () => {
+  const {plants, selectedPlant, setPlants, setSelectedPlant, setSensorData} = usePlantStore();
+  const [isAddOpen, setIsAddOpen] = useState<boolean>(false);
+  const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
+
   useEffect(() => {
     const dummyPlants: Plant[] = [
       {
@@ -21,7 +28,7 @@ const Manage = () => {
       },
       {
         id: 2,
-        name: '상추',
+        name: '',
         plantType: '엽채류',
         minTemp: 15,
         maxTemp: 25,
@@ -32,7 +39,7 @@ const Manage = () => {
       },
       {
         id: 3,
-        name: '딸기',
+        name: 'strawberry',
         plantType: '과채류',
         minTemp: 18,
         maxTemp: 28,
@@ -56,14 +63,50 @@ const Manage = () => {
     setSensorData(dummySensorData)
   }, [setPlants, setSelectedPlant, setSensorData])
 
+  const handleEdit = (p: Plant) => {
+    setSelectedPlant(p)
+    // 모달 열기 로직…
+  }
+  const handleDetail = (p: Plant) => {
+    setSelectedPlant(p)
+    // 상세 모달 열기…
+  }
+  const handleDelete = (p: Plant) => {
+    // API 호출 후 스토어 갱신…
+  }
+  const handleAdd = () => {
+    // 추가 모달 열기…
+  }
 
   return (
-    <div className='p-2 space-y-6'>
-      <DashboardHeader title="작물 관리" subTitle='작물 정보를 등록 및 관리하세요' />
-      <hr className='h-0.25 border-0 bg-gray-200 dark:bg-gray-600' />
+    <>
+      <div className="p-6 space-y-6">
+        <DashboardHeader
+          title="식물 관리"
+          subTitle="작물 정보를 등록 및 관리하세요"
+        />
+        <hr className="h-0.5 border-0 bg-gray-200 dark:bg-gray-600" />
+        {true! && <AlertBanner /> }
 
-      {true! && <AlertBanner /> }
-    </div>
+        {/* Plant Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+          {plants.map((p) => (
+            <PlantItem
+              key={p.id}
+              plant={p}
+              onEdit={handleEdit}
+              onDetail={handleDetail}
+              onDelete={handleDelete}
+              setEditOpen={setIsEditOpen}
+            />
+          ))}
+          {/* 추가 카드 */}
+          <AddPlantCard onAdd={handleAdd} setIsOpen={setIsAddOpen} />
+        </div>
+      </div>
+      {isAddOpen && <AddPlantModal isOpen={isAddOpen} setIsOpen={setIsAddOpen}  />}
+      {isEditOpen && <EditPlantModal isOpen={isEditOpen} setIsOpen={setIsEditOpen} initialData={selectedPlant!} />}
+    </>
   )
 }
 
