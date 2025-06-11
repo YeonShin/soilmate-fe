@@ -1,5 +1,5 @@
 import React from 'react'
-
+import { CiCircleAlert } from "react-icons/ci";
 import {
   LineChart,
   Line,
@@ -56,6 +56,7 @@ const SensorGraph: React.FC<SensorGraphProps> = ({type, logs, loading}) => {
       </h4>
 
       {/* 2) 차트 */}
+      {logs === null ? (
       <div className="h-64">
         {loading ? (
           <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
@@ -92,6 +93,13 @@ const SensorGraph: React.FC<SensorGraphProps> = ({type, logs, loading}) => {
           </ResponsiveContainer>
         )}
       </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400 space-y-2 py-8">
+          <CiCircleAlert className="text-4xl" />
+          <span className="text-lg">최근 관수 내역이 없습니다.</span>
+        </div>
+      )}
+
     </div>
   )
 }
