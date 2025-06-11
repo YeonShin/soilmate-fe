@@ -1,15 +1,21 @@
 // src/screen/Login.tsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { MdDarkMode } from "react-icons/md";
 import { CiDark } from "react-icons/ci";
 import Logo from "/logo.png";
 import { useThemeStore } from '../store/useThemeStore';
+import axios from 'axios';
+import { useAuthStore } from '../store/useAuthStore';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+
 
   const {dark, toggle} = useThemeStore();
+    const { setToken } = useAuthStore()
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark);
@@ -18,7 +24,21 @@ const Login: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: 로그인 처리 로직
-    navigate('/');
+    const fetchLogin = async () => {
+      try {
+        const res = await axios.post(
+          'http://localhost:8080/api/auth/signin',
+          { username, password},
+          { headers: { 'Content-Type': 'application/json', accept: 'application/json' } }
+        )
+        setToken(res.data.token)
+        navigate('/')
+      } catch (err) {
+        console.error("로그인 실패", err);
+      }
+    }
+
+    fetchLogin();
   };
 
   return (
@@ -45,7 +65,7 @@ const Login: React.FC = () => {
           <img src={Logo} alt="logo" className="w-32 mx-auto mb-8 cursor-pointer" onClick={() => navigate("/")} />
 
           <h2 className="text-3xl font-bold text-green-800 dark:text-green-300 text-center mb-6">
-            Login
+             로그인
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -55,6 +75,8 @@ const Login: React.FC = () => {
               <input
                 id="username"
                 type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
                 placeholder="Enter ID"
                 className="
@@ -76,6 +98,8 @@ const Login: React.FC = () => {
                 id="password"
                 type="password"
                 required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter Password"
                 className="
                   w-full px-4 py-2
@@ -89,15 +113,6 @@ const Login: React.FC = () => {
               />
             </div>
 
-            {/* 비밀번호 찾기 */}
-            <div className="text-right">
-              <Link
-                to="/forgot-password"
-                className="text-sm text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400"
-              >
-                Forgot Password?
-              </Link>
-            </div>
 
             {/* 로그인 버튼 */}
             <button
@@ -111,18 +126,18 @@ const Login: React.FC = () => {
                 rounded-lg transition
               "
             >
-              Sign In
+              로그인
             </button>
           </form>
 
           {/* 회원가입 유도 */}
           <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
-            Don’t have an account?{' '}
+            계정이 아직 없으신가요?{' '}
             <Link
               to="/signup"
               className="text-green-600 dark:text-green-300 hover:underline"
             >
-              Sign Up
+              회원가입
             </Link>
           </p>
         </div>
