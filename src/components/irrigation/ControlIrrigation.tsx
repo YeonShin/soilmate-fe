@@ -1,15 +1,54 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { usePlantStore } from '../../store/usePlantStore'
 import { IoIosWater } from 'react-icons/io'
+import axios from 'axios'
+import { useAuthStore } from '../../store/useAuthStore'
 
 interface ControlIrrigationProps {
-  onIrrigate: (amountMl: number) => void
-  disabled: boolean
+  onSuccess: () => void
 }
 
-const ControlIrrigation:React.FC<ControlIrrigationProps> = ({onIrrigate, disabled}) => {
-  const { selectedPlant, sensorData } = usePlantStore()
+const ControlIrrigation:React.FC<ControlIrrigationProps> = ({onSuccess}) => {
+  const { selectedPlant } = usePlantStore()
   const [amount, setAmount] = useState<number>(0)
+  const {token} = useAuthStore();
+  const [disabled, setDisabled] = useState<boolean>(false);
+
+  const handleIrrigate = async () => {
+    if (selectedPlant === null) return;
+
+    try {
+      const payload = {
+        plantId: selectedPlant.id,
+        amopuntMl: amount,
+        method: "manual"
+      }
+
+      await axios.post(
+        `/api/pump_commands`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        }
+      )
+
+      alert("수동 관수 명령 성공")
+      onSuccess()
+    } catch (err) {
+      console.error("수동 관수 실패", err)
+    }
+  }
+
+  useEffect(() => {
+    if (selectedPlant === null) {
+      setDisabled(true)
+    } else {
+      setDisabled(false)
+    }
+  }, [selectedPlant])
 
 
   return (
@@ -30,17 +69,18 @@ const ControlIrrigation:React.FC<ControlIrrigationProps> = ({onIrrigate, disable
       <input
         type="number"
         value={amount}
+        disabled={disabled}
         onChange={e => setAmount(Number(e.target.value))}
-        className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+        className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition disabled:bg-gray-200"
         placeholder="입력하세요"
       />
 
       {/* 버튼 */}
       <button
-        onClick={() => onIrrigate(amount)}
+        onClick={() => handleIrrigate()}
         disabled={disabled}
         className={`
-          cursor-pointer
+          cursor-pointer disabled:cursor-auto
           w-full h-12 flex items-center justify-center space-x-2
           bg-green-500 hover:bg-green-600 dark:bg-green-700 dark:hover:bg-green-600
           text-white font-medium rounded-md

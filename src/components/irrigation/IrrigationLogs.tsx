@@ -1,18 +1,7 @@
 import React from 'react'
 import { IoIosTimer } from "react-icons/io";
-
-interface Plant {
-  id: number
-  name: string
-}
-
-interface IrrigationLog {
-  id: number
-  plant: Plant
-  amountMl: number
-  method: 'auto' | 'manual'
-  timestamp: string
-}
+import type { IrrigationLog } from '../../screen/Irrigation';
+import { CiCircleAlert } from "react-icons/ci";
 
 interface IrrigationLogsProps {
   logs: IrrigationLog[]
@@ -28,7 +17,12 @@ const IrrigationLogs:React.FC<IrrigationLogsProps> = ({ logs }) => {
         <span className='text-gray-700 dark:text-gray-200'>최근 관수 기록</span>
       </div>
 
-      <ul className="space-y-2">
+      {logs.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400 space-y-2">
+          <CiCircleAlert className="text-4xl" />
+          <span className="text-lg">최근 관수 내역이 없습니다.</span>
+        </div>
+      ) : (<ul className="space-y-2">
         {logs.map((log) => (
           <li
             key={log.id}
@@ -58,7 +52,8 @@ const IrrigationLogs:React.FC<IrrigationLogsProps> = ({ logs }) => {
             </div>
           </li>
         ))}
-      </ul>
+      </ul>)}
+      
     </div>
   )
 }

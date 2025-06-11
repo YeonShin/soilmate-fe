@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from 'react'
-import { usePlantStore, type Plant, type SensorData } from '../store/usePlantStore';
+import { usePlantStore } from '../store/usePlantStore';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
 import AlertBanner from '../components/dashboard/AlertBanner';
 import ControlIrrigation from '../components/irrigation/ControlIrrigation';
 import IrrigationLogs from '../components/irrigation/IrrigationLogs';
+import { useAuthStore } from '../store/useAuthStore';
+import axios from 'axios';
+import { useAlertStore } from '../store/useAlertStore';
 
-interface IrrigationLog {
+interface Plant {
+  id: number
+  name: string
+}
+
+export interface IrrigationLog {
   id: number
   plant: Plant
   amountMl: number
@@ -14,99 +22,39 @@ interface IrrigationLog {
 }
 
 const Irrigation = () => {
-  const {selectedPlant, setPlants, setSelectedPlant, setSensorData} = usePlantStore();
-  const [loading, setLoading] = useState(false)
+  const {selectedPlant} = usePlantStore();
+  const {alerts} = useAlertStore()
   const [logs, setLogs] = useState<IrrigationLog[]>([])
+  const {token} = useAuthStore();
+  const onSuccess = () => {
+    console.log("관수 성공")
+  }
+
+  const fetchIrrigationLogs = async () => {
+    if (selectedPlant === null) return;
+    try {
+
+      const res = await axios.get<IrrigationLog[]>(
+        `/api/watering/logs/plants/${selectedPlant.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        }
+      )
+
+      setLogs(res.data)
+
+    } catch (err) {
+      console.error("관수 기록 조회 실패", err)
+    }
+  }
 
   useEffect(() => {
-    const dummyPlants: Plant[] = [
-      {
-        id: 1,
-        name: '토마토',
-        plantType: '과채류',
-        minTemp: 20,
-        maxTemp: 30,
-        minHumidity: 60,
-        maxHumidity: 80,
-        minSoilMoisture: 30,
-        maxSoilMoisture: 70,
-      },
-      {
-        id: 2,
-        name: '상추',
-        plantType: '엽채류',
-        minTemp: 15,
-        maxTemp: 25,
-        minHumidity: 65,
-        maxHumidity: 90,
-        minSoilMoisture: 40,
-        maxSoilMoisture: 80,
-      },
-      {
-        id: 3,
-        name: '딸기',
-        plantType: '과채류',
-        minTemp: 18,
-        maxTemp: 28,
-        minHumidity: 65,
-        maxHumidity: 85,
-        minSoilMoisture: 35,
-        maxSoilMoisture: 75,
-      },
-    ]
+    fetchIrrigationLogs()
+  }, [selectedPlant, onSuccess])
 
-    // 2) 더미 센서 데이터
-    const dummySensorData: SensorData = {
-      temperature: 25.5,
-      humidity: 82.5,
-      soilMoisture: 22.5,
-    }
-
-    // 2) 스토어에 넣기
-    setPlants(dummyPlants)
-    // setSelectedPlant(dummyPlants[0])
-    setSensorData(dummySensorData)
-
-    setLogs([
-      {
-        id: 1,
-        plant: dummyPlants[0],
-        amountMl: 200,
-        method: 'auto',
-        timestamp: '2025-06-09T12:00:00',
-      },
-      {
-        id: 2,
-        plant: dummyPlants[1],
-        amountMl: 150,
-        method: 'manual',
-        timestamp: '2025-06-09T10:30:00',
-      },
-      {
-        id: 3,
-        plant: dummyPlants[0],
-        amountMl: 180,
-        method: 'auto',
-        timestamp: '2025-06-09T08:00:00',
-      },
-    ])
-  }, [setPlants, setSelectedPlant, setSensorData])
-
-    const handleIrrigate = (amountMl: number) => {
-    if (!selectedPlant) return
-    setLoading(true)
-    // 나중에 API 호출
-    const newLog: IrrigationLog = {
-      id: Date.now(),
-      plant: selectedPlant,
-      amountMl,
-      method: 'manual',
-      timestamp: new Date().toISOString(),
-    }
-    // 더미 반영
-    setLogs((prev) => [newLog, ...prev])
-    setLoading(false)
-  }
 
   return (
     <div className='p-2 space-y-6'>
@@ -114,9 +62,9 @@ const Irrigation = () => {
 
       <hr className='h-0.25 border-0 bg-gray-200 dark:bg-gray-600' />
 
-      {true! && <AlertBanner /> }
+      {alerts.length > 0 && <AlertBanner /> }
       <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-        <ControlIrrigation onIrrigate={handleIrrigate} disabled={loading}  />
+        <ControlIrrigation onSuccess={fetchIrrigationLogs}  />
         <IrrigationLogs logs={logs} />
       </div>
     </div>
