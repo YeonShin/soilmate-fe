@@ -14,27 +14,35 @@ export interface Plant {
   maxSoilMoisture: number
 }
 
+interface SensorPlant {
+  id: number
+  name: string
+}
+
 export interface SensorData {
+  id: number
+  plant: SensorPlant
   temperature: number
   humidity: number
   soilMoisture: number
+  timestamp: string
 }
 
 interface PlantState {
   plants: Plant[]
   selectedPlant: Plant | null
-  sensorData: SensorData
+  sensorData: SensorData[]
 
   // actions
   setPlants: (plants: Plant[]) => void
   setSelectedPlant: (p: Plant) => void
-  setSensorData: (d: SensorData) => void
+  setSensorData: (d: SensorData[]) => void
 }
 
 export const usePlantStore = create<PlantState>((set) => ({
   plants: [],
   selectedPlant: null,
-  sensorData: { temperature: 0, humidity: 0, soilMoisture: 0 },
+  sensorData: [],
 
   setPlants: (plants) => set({ plants }),
   setSelectedPlant: (selectedPlant) => set({ selectedPlant }),
