@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Outlet } from 'react-router';
+import { Outlet, useLocation } from 'react-router';
 import Navbar from './Navbar';
 import { usePlantStore } from '../store/usePlantStore';
 import { useAlertStore, type AlertLog } from '../store/useAlertStore';
@@ -10,6 +10,7 @@ const Root = () => {
   const {setPlants, selectedPlant} = usePlantStore();
   const {setAlerts} = useAlertStore();
   const {token} = useAuthStore();
+  const { pathname } = useLocation()
 
   const fetchPlants = async () => {
       try {
@@ -53,7 +54,7 @@ const Root = () => {
   useEffect(() => {
     fetchPlants()
     fetchAlerts()
-  }, [])
+  }, [pathname])
 
   return (
     <div className='flex min-h-screen bg-gray-50 dark:bg-gray-900'>

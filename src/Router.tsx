@@ -18,13 +18,11 @@ const Router = () => {
 
         <Route element={<RequireAuth />}>
           <Route path='/' element={<Root />} >
-          <Route>
             <Route index element={<Dashboard />} />
             <Route path='monitor' element={<Monitoring />} />
             <Route path='irrigation' element={<Irrigation/>} />
             <Route path='alerts' element={<Alerts />} />
             <Route path='manage' element={<Manage />} />
-          </Route>
         </Route>
       </Route>
       <Route path='*' element={<NotFound />} />
