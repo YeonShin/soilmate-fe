@@ -24,29 +24,12 @@ const sensorMap: Record<TabKey, string> = {
 
 
 const Alerts = () => {
-  const {selectedPlant, setPlants} = usePlantStore();
+  const {selectedPlant} = usePlantStore();
   const [activeTab, setActiveTab] = useState<TabKey>('all')
   const [loading, setLoading] = useState(false)
   const [alerts, setAlerts] = useState<AlertLog[]>([]) 
   const {token} = useAuthStore();
 
-  const fetchPlants = async () => {
-    try {
-      const res = await axios.get(
-        `/api/plants`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          }
-        }
-      )
-
-      setPlants(res.data);
-    } catch (err) {
-      console.error("작물 정보 조회 실패", err)
-    }
-  } 
 
   const fetchAlerts = async () => {
     if (selectedPlant === null) return;
@@ -74,12 +57,6 @@ const Alerts = () => {
       console.error("센서 오류 조회 실패", err)
     }
   }
-
-
-
-  useEffect(() => {
-    fetchPlants()
-  }, [])
 
   useEffect(() => {
     fetchAlerts()
