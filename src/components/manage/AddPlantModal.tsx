@@ -1,20 +1,21 @@
 // src/components/plant/AddPlantModal.tsx
 import React, { useState } from 'react'
 import { IoClose } from 'react-icons/io5'
-import type { Plant } from '../../store/usePlantStore'
 import axios from 'axios'
+import { useAuthStore } from '../../store/useAuthStore'
 
 interface AddPlantModalProps {
-  setPlants: React.Dispatch<React.SetStateAction<Plant[]>>
+  onSuccess: () => void     // 성공 시 호출할 콜백
   isOpen: boolean
   setIsOpen:  React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export const AddPlantModal: React.FC<AddPlantModalProps> = ({
-  setPlants,
+const AddPlantModal: React.FC<AddPlantModalProps> = ({
+  onSuccess,
   isOpen,
   setIsOpen,
 }) => {
+  const { token } = useAuthStore();
   const [form, setForm] = useState({
     name: '',
     type: '',
@@ -28,15 +29,48 @@ export const AddPlantModal: React.FC<AddPlantModalProps> = ({
 
   const handleChange =
     (key: keyof typeof form) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-      setForm({
-        ...form,
-        [key]: e.target.value,
-      })
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      const raw = e.target.value
+      const val =
+        e.target instanceof HTMLInputElement && e.target.type === 'number'
+          ? Number(raw)
+          : raw
+      setForm((prev) => ({ ...prev, [key]: val }))
+    }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+
     // 등록 api 요청
+    try {
+      const payload = {
+        name: form.name,
+        plantType: form.type,
+        minTemp: form.minTemp,
+        maxTemp: form.maxTemp,
+        minHumidity: form.minHumidity,
+        maxHumidity: form.maxHumidity,
+        minSoilMoisture: form.minSoilMoisture,
+        maxSoilMoisture: form.maxSoilMoisture,
+      }
 
+      await axios.post(
+        '/api/plants',
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        }
+      )
+
+      alert("작물 정보 등록에 성공하였습니다")
+      onSuccess();
+      setIsOpen(false);
+
+    } catch (err) {
+      console.error("작물 정보 등록 실패", err);
+    }
 
     setIsOpen(false)
   }
@@ -101,6 +135,8 @@ export const AddPlantModal: React.FC<AddPlantModalProps> = ({
               type="number"
               value={form.minTemp}
               onChange={handleChange('minTemp')}
+              min={0}
+              max={100}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             />
           </div>
@@ -112,6 +148,8 @@ export const AddPlantModal: React.FC<AddPlantModalProps> = ({
               type="number"
               value={form.maxTemp}
               onChange={handleChange('maxTemp')}
+              min={0}
+              max={100}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             />
           </div>
@@ -125,6 +163,8 @@ export const AddPlantModal: React.FC<AddPlantModalProps> = ({
               type="number"
               value={form.minHumidity}
               onChange={handleChange('minHumidity')}
+              min={0}
+              max={100}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             />
           </div>
@@ -136,6 +176,8 @@ export const AddPlantModal: React.FC<AddPlantModalProps> = ({
               type="number"
               value={form.maxHumidity}
               onChange={handleChange('maxHumidity')}
+              min={0}
+              max={100}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             />
           </div>
@@ -149,6 +191,8 @@ export const AddPlantModal: React.FC<AddPlantModalProps> = ({
               type="number"
               value={form.minSoilMoisture}
               onChange={handleChange('minSoilMoisture')}
+              min={0}
+              max={100}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             />
           </div>
@@ -160,6 +204,8 @@ export const AddPlantModal: React.FC<AddPlantModalProps> = ({
               type="number"
               value={form.maxSoilMoisture}
               onChange={handleChange('maxSoilMoisture')}
+              min={0}
+              max={100}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             />
           </div>
@@ -184,3 +230,5 @@ export const AddPlantModal: React.FC<AddPlantModalProps> = ({
     </div>
   )
 }
+
+export default AddPlantModal

@@ -5,6 +5,8 @@ import { IoIosWater }    from 'react-icons/io'
 import { MdGrass }       from 'react-icons/md'
 import { FiEdit2, FiTrash2 } from 'react-icons/fi'
 import { fetchFirstSearchPhoto } from '../../api/unplash'
+import { useAuthStore } from '../../store/useAuthStore'
+import axios from 'axios'
 
 export interface Plant {
   id: number
@@ -20,28 +22,17 @@ export interface Plant {
 
 interface Props {
   plant: Plant
-  onEdit: (p: Plant) => void
   onDelete: (p: Plant) => void
-
   setEditOpen: React.Dispatch<React.SetStateAction<boolean>>
+  onSuccess: () => void 
 }
 
-export const PlantItem: React.FC<Props> = ({ plant, onEdit, onDelete, setEditOpen }) => {
+export const PlantItem: React.FC<Props> = ({ plant, setEditOpen, onSuccess }) => {
     const [imgUrl, setImgUrl] = useState<string>('/fallback-plant.png')
+  const {token} = useAuthStore();
 
-
-    useEffect(() => {
+  useEffect(() => {
     let canceled = false
-
-    // 1) 랜덤 사진
-    // fetchRandomPhoto(plant.name)
-    //   .then((url) => {
-    //     if (!canceled) setImgUrl(url)
-    //   })
-    //   .catch((err) => {
-    //     // 실패 시 fallback
-    //     console.error(err);
-    //   })
 
     // // 2) 검색 첫 번째 사진
     fetchFirstSearchPhoto(plant.name).then(url => {
@@ -52,6 +43,25 @@ export const PlantItem: React.FC<Props> = ({ plant, onEdit, onDelete, setEditOpe
       canceled = true
     }
   }, [plant.name])
+
+  const handleDelete = async () => {
+    try {
+      await axios.delete(
+        `/api/plants/${plant.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        }
+      )
+
+      alert("작물 정보 삭제 완료!")
+      onSuccess();
+    } catch (err) {
+      console.error("작물 정보 삭제 실패", err);
+    }
+  }
 
   return (
     <div className="flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
@@ -106,14 +116,14 @@ export const PlantItem: React.FC<Props> = ({ plant, onEdit, onDelete, setEditOpe
         {/* 버튼 그룹 */}
         <div className="mt-4 flex space-x-2">
           <button
-            onClick={() => {setEditOpen(true); onEdit(plant)}}
+            onClick={() => {setEditOpen(true)}}
             className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition"
           >
             <FiEdit2 className="w-4 h-4" />
             수정
           </button>
           <button
-            onClick={() => onDelete(plant)}
+            onClick={handleDelete}
             className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition"
           >
             <FiTrash2 className="w-4 h-4" />

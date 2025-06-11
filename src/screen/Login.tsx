@@ -27,7 +27,7 @@ const Login: React.FC = () => {
     const fetchLogin = async () => {
       try {
         const res = await axios.post(
-          'http://localhost:8080/api/auth/signin',
+          '/api/auth/signin',
           { username, password},
           { headers: { 'Content-Type': 'application/json', accept: 'application/json' } }
         )
@@ -134,7 +134,7 @@ const Login: React.FC = () => {
           <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
             계정이 아직 없으신가요?{' '}
             <Link
-              to="/signup"
+              to="/register"
               className="text-green-600 dark:text-green-300 hover:underline"
             >
               회원가입

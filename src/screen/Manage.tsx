@@ -5,44 +5,43 @@ import AlertBanner from '../components/dashboard/AlertBanner'
 import { PlantItem } from '../components/manage/PlantItem'
 import { AddPlantCard } from '../components/manage/AddPlantCard'
 import { usePlantStore, type Plant } from '../store/usePlantStore'
-import { AddPlantModal } from '../components/manage/AddPlantModal'
 import { EditPlantModal } from '../components/manage/EditPlantModal'
 import axios from 'axios'
+import { useAuthStore } from '../store/useAuthStore'
+import AddPlantModal from '../components/manage/AddPlantModal'
 
 const Manage: React.FC = () => {
   const {plants, selectedPlant, setPlants, setSelectedPlant} = usePlantStore();
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false);
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
+  const { token } = useAuthStore();
+
+  const fetchPlants = async () => {
+      try {
+        const res = await axios.get(
+          `/api/plants`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            }
+          }
+        )
+
+        setPlants(res.data);
+      } catch (err) {
+        console.error("작물 정보 조회 실패", err)
+      }
+    } 
 
   useEffect(() => {
-    const fetchPlants = async () => {
-    try {
-      const res = await axios.get<Plant[]>(`http://localhost:8080/api/plants`)
-      setPlants(res.data)
-    } catch (error) {
-      console.error('식물 목록 불러오기 실패:', error)
-      // 필요시 에러 처리 로직 추가
-    }
-    }
+
 
     fetchPlants();
-    // 2) 스토어에 넣기
-  }, [setPlants])
+    // 2) 스토어에 넣기 
+  }, [])
 
-  const handleEdit = (p: Plant) => {
-    setSelectedPlant(p)
-    // 모달 열기 로직…
-  }
-  const handleDetail = (p: Plant) => {
-    setSelectedPlant(p)
-    // 상세 모달 열기…
-  }
-  const handleDelete = (p: Plant) => {
-    // API 호출 후 스토어 갱신…
-  }
-  const handleAdd = () => {
-    // 추가 모달 열기…
-  }
+
 
   return (
     <>
@@ -60,18 +59,16 @@ const Manage: React.FC = () => {
             <PlantItem
               key={p.id}
               plant={p}
-              onEdit={handleEdit}
-              onDetail={handleDetail}
-              onDelete={handleDelete}
               setEditOpen={setIsEditOpen}
+              onSuccess={fetchPlants}
             />
           ))}
           {/* 추가 카드 */}
           <AddPlantCard  setIsOpen={setIsAddOpen} />
         </div>
       </div>
-      {isAddOpen && <AddPlantModal setPlants={setPlants} isOpen={isAddOpen} setIsOpen={setIsAddOpen}  />}
-      {isEditOpen && <EditPlantModal isOpen={isEditOpen} setIsOpen={setIsEditOpen} initialData={selectedPlant!} />}
+      {isAddOpen && <AddPlantModal onSuccess={fetchPlants} isOpen={isAddOpen} setIsOpen={setIsAddOpen}  />}
+      {isEditOpen && <EditPlantModal isOpen={isEditOpen} setIsOpen={setIsEditOpen} initialData={selectedPlant!} onSuccess={fetchPlants} />}
     </>
   )
 }

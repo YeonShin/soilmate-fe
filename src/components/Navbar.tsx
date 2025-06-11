@@ -1,6 +1,6 @@
 // src/components/Navbar.tsx
 import React, { useEffect } from "react"
-import { NavLink } from "react-router"
+import { NavLink, useNavigate } from "react-router"
 import { useThemeStore } from "../store/useThemeStore"
 import { MdHomeFilled, MdDarkMode } from "react-icons/md"
 import { FaLeaf } from "react-icons/fa";
@@ -12,6 +12,7 @@ import { FaPowerOff } from "react-icons/fa"
 import { HiOutlineMenu } from "react-icons/hi"
 import Logo from "/logo.png"
 import { useSidebarStore } from "../store/useSidebarStore";
+import { useAuthStore } from "../store/useAuthStore";
 
 const MENU = [
   { to: "/",        icon: <MdHomeFilled    size={28} />, label: "대시보드"      },
@@ -22,12 +23,20 @@ const MENU = [
 ]
 
 const Navbar: React.FC = () => {
+  const navigate = useNavigate();
   const { dark, toggle } = useThemeStore()
-    const { collapsed, toggle: toggleSidebar } = useSidebarStore()
+  const { collapsed, toggle: toggleSidebar } = useSidebarStore()
+  const {logout} = useAuthStore();
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark)
   }, [dark])
+
+  const handleLogout = () => {
+    logout();
+
+    navigate('/login')
+  }
 
   return (
      <aside
@@ -118,7 +127,7 @@ const Navbar: React.FC = () => {
         </button>
 
         <button
-          onClick={() => console.log('logout')}
+          onClick={handleLogout}
           className="w-full flex items-center px-4 py-2 text-sm text-red-600
                      hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-800
                      rounded-lg transition-colors"

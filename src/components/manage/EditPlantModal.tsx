@@ -1,19 +1,24 @@
 import React, { useState, useEffect } from 'react'
 import { IoClose } from 'react-icons/io5'
 import type { Plant } from '../../store/usePlantStore'
+import { useAuthStore } from '../../store/useAuthStore'
+import axios from 'axios'
 
 
 interface EditPlantModalProps {
+  onSuccess: () => void 
   isOpen: boolean
   setIsOpen:  React.Dispatch<React.SetStateAction<boolean>>
   initialData: Plant
 }
 
 export const EditPlantModal: React.FC<EditPlantModalProps> = ({
+  onSuccess,
   isOpen,
   setIsOpen,
   initialData,
 }) => {
+  const { token } = useAuthStore();
   const [form, setForm] = useState<Plant>(initialData)
 
   useEffect(() => {
@@ -21,16 +26,50 @@ export const EditPlantModal: React.FC<EditPlantModalProps> = ({
   }, [initialData])
 
   const handleChange =
-    (key: keyof Plant) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-      setForm(prev => ({
-        ...prev,
-        [key]: typeof prev[key] === 'number' ? e.target.valueAsNumber : e.target.value,
-      }))
+    (key: keyof typeof form) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      const raw = e.target.value
+      const val =
+        e.target instanceof HTMLInputElement && e.target.type === 'number'
+          ? Number(raw)
+          : raw
+      setForm((prev) => ({ ...prev, [key]: val }))
+    }
 
-  const handleSubmit = () => {
-    // save api 요청
-    setIsOpen(false);
+  const handleSubmit = async () => {
+    // 등록 api 요청
+    try {
+      const payload = {
+        name: form.name,
+        plantType: form.plantType,
+        minTemp: form.minTemp,
+        maxTemp: form.maxTemp,
+        minHumidity: form.minHumidity,
+        maxHumidity: form.maxHumidity,
+        minSoilMoisture: form.minSoilMoisture,
+        maxSoilMoisture: form.maxSoilMoisture,
+      }
+
+      await axios.put(
+        `/api/plants/${initialData.id}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        }
+      )
+
+      alert("작물 정보 수정에 성공하였습니다")
+      onSuccess();
+      setIsOpen(false);
+
+    } catch (err) {
+      console.error("작물 정보 수정 실패", err);
+    }
+
+    setIsOpen(false)
   }
 
   if (!isOpen) return null

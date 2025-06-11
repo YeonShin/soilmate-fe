@@ -25,7 +25,7 @@ const Register: React.FC = () => {
     e.preventDefault()
     try {
       await axios.post(
-        `${API_BASE}/api/auth/signup`,
+        `/api/auth/signup`,
         { username, password },
         { headers: { 'Content-Type': 'application/json', accept: 'text/plain' } }
       )
