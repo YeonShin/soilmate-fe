@@ -4,64 +4,30 @@ import DashboardHeader from '../components/dashboard/DashboardHeader'
 import AlertBanner from '../components/dashboard/AlertBanner'
 import { PlantItem } from '../components/manage/PlantItem'
 import { AddPlantCard } from '../components/manage/AddPlantCard'
-import { usePlantStore, type Plant, type SensorData } from '../store/usePlantStore'
+import { usePlantStore, type Plant } from '../store/usePlantStore'
 import { AddPlantModal } from '../components/manage/AddPlantModal'
 import { EditPlantModal } from '../components/manage/EditPlantModal'
+import axios from 'axios'
 
 const Manage: React.FC = () => {
-  const {plants, selectedPlant, setPlants, setSelectedPlant, setSensorData} = usePlantStore();
+  const {plants, selectedPlant, setPlants, setSelectedPlant} = usePlantStore();
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false);
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    const dummyPlants: Plant[] = [
-      {
-        id: 1,
-        name: '토마토',
-        plantType: '과채류',
-        minTemp: 20,
-        maxTemp: 30,
-        minHumidity: 60,
-        maxHumidity: 80,
-        minSoilMoisture: 30,
-        maxSoilMoisture: 70,
-      },
-      {
-        id: 2,
-        name: '',
-        plantType: '엽채류',
-        minTemp: 15,
-        maxTemp: 25,
-        minHumidity: 65,
-        maxHumidity: 90,
-        minSoilMoisture: 40,
-        maxSoilMoisture: 80,
-      },
-      {
-        id: 3,
-        name: 'strawberry',
-        plantType: '과채류',
-        minTemp: 18,
-        maxTemp: 28,
-        minHumidity: 65,
-        maxHumidity: 85,
-        minSoilMoisture: 35,
-        maxSoilMoisture: 75,
-      },
-    ]
-
-    // 2) 더미 센서 데이터
-    const dummySensorData: SensorData = {
-      temperature: 25.5,
-      humidity: 82.5,
-      soilMoisture: 22.5,
+    const fetchPlants = async () => {
+    try {
+      const res = await axios.get<Plant[]>(`http://localhost:8080/api/plants`)
+      setPlants(res.data)
+    } catch (error) {
+      console.error('식물 목록 불러오기 실패:', error)
+      // 필요시 에러 처리 로직 추가
+    }
     }
 
+    fetchPlants();
     // 2) 스토어에 넣기
-    setPlants(dummyPlants)
-    // setSelectedPlant(dummyPlants[0])
-    setSensorData(dummySensorData)
-  }, [setPlants, setSelectedPlant, setSensorData])
+  }, [setPlants])
 
   const handleEdit = (p: Plant) => {
     setSelectedPlant(p)
@@ -101,10 +67,10 @@ const Manage: React.FC = () => {
             />
           ))}
           {/* 추가 카드 */}
-          <AddPlantCard onAdd={handleAdd} setIsOpen={setIsAddOpen} />
+          <AddPlantCard  setIsOpen={setIsAddOpen} />
         </div>
       </div>
-      {isAddOpen && <AddPlantModal isOpen={isAddOpen} setIsOpen={setIsAddOpen}  />}
+      {isAddOpen && <AddPlantModal setPlants={setPlants} isOpen={isAddOpen} setIsOpen={setIsAddOpen}  />}
       {isEditOpen && <EditPlantModal isOpen={isEditOpen} setIsOpen={setIsEditOpen} initialData={selectedPlant!} />}
     </>
   )

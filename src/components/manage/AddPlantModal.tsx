@@ -1,13 +1,17 @@
 // src/components/plant/AddPlantModal.tsx
 import React, { useState } from 'react'
 import { IoClose } from 'react-icons/io5'
+import type { Plant } from '../../store/usePlantStore'
+import axios from 'axios'
 
 interface AddPlantModalProps {
+  setPlants: React.Dispatch<React.SetStateAction<Plant[]>>
   isOpen: boolean
   setIsOpen:  React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export const AddPlantModal: React.FC<AddPlantModalProps> = ({
+  setPlants,
   isOpen,
   setIsOpen,
 }) => {
@@ -32,6 +36,7 @@ export const AddPlantModal: React.FC<AddPlantModalProps> = ({
 
   const handleSubmit = () => {
     // 등록 api 요청
+
 
     setIsOpen(false)
   }

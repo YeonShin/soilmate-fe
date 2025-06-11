@@ -54,6 +54,8 @@ const Dashboard = () => {
       soilMoisture: 22.5,
     }
 
+    
+
     // 2) 스토어에 넣기
     setPlants(dummyPlants)
     // setSelectedPlant(dummyPlants[0])

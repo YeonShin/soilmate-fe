@@ -8,11 +8,13 @@ import Monitoring from './screen/Monitoring';
 import Alerts from './screen/Alerts';
 import Manage from './screen/Manage';
 import Irrigation from './screen/Irrigation';
+import Register from './screen/Register';
 
 const Router = () => {
   return (
     <Routes>
       <Route path="login" element={<Login />} />
+      <Route path='register' element={<Register />} />
 
         <Route element={<RequireAuth />}>
           <Route path='/' element={<Root />} >

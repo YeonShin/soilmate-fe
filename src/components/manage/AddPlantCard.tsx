@@ -1,13 +1,14 @@
 // src/components/dashboard/AddPlantCard.tsx
 import React from 'react'
 import { AiOutlinePlus } from 'react-icons/ai'
+import type { Plant } from '../../store/usePlantStore'
 
 interface Props {
-  onAdd: () => void
+
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export const AddPlantCard: React.FC<Props> = ({ onAdd, setIsOpen }) => (
+export const AddPlantCard: React.FC<Props> = ({  setIsOpen }) => (
   <button
     onClick={() => setIsOpen(true)}
     className="
