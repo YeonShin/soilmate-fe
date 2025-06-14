@@ -5,6 +5,7 @@ import AlertBanner from '../components/dashboard/AlertBanner';
 import SensorGraph from '../components/monitor/SensorGraph';
 import axios from 'axios';
 import { useAlertStore } from '../store/useAlertStore';
+import { useAuthStore } from '../store/useAuthStore';
 
 
 interface PlantStatusLog {
@@ -26,6 +27,7 @@ const Monitoring = () => {
   const oneHourAgo = new Date(now.getTime() - 60*60*1000)
   const [start, setStart] = useState(oneHourAgo.toISOString().slice(0,16))
   const [end, setEnd]     = useState(now      .toISOString().slice(0,16))
+  const { token } = useAuthStore();
 
    const fetchLogs = async () => {
     if (!selectedPlant) return
@@ -33,7 +35,13 @@ const Monitoring = () => {
     try {
       const res = await axios.get<PlantStatusLog[]>(
         `/api/sensors/logs/plant/${selectedPlant.id}/range`,
-        { params: { start, end } }
+        { params: { start, end },
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            }
+      },
+
       )
       // API 결과는 오래된 순 → recharts에 그대로 넘겨도 OK
       setLogs(res.data)
